@@ -23,10 +23,11 @@ This image comes with gomobile checkedout and preinitialized (time and space con
 - Change base image openjdk:8 to ubuntu:16.04
 - Install libgl & vim & curl & others
 - Build docker image & make .apk
-
+```
     docker build .  -t android-gomobile    
     docker run -d --name gomob android-gomobile
     docker exec -it gomob /bin/bash
     
     cd go/src/golang.org/x/mobile/example/basic/
     gomobile build
+```
