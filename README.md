@@ -24,9 +24,9 @@ This image comes with gomobile checkedout and preinitialized (time and space con
 - Install libgl & vim & curl & others
 - Build docker image & make .apk
 
- docker build .  -t android-gomobile
- docker run -d --name gomob android-gomobile
- docker exec -it gomob /bin/bash
-
- cd go/src/golang.org/x/mobile/example/basic/
- gomobile build
+    docker build .  -t android-gomobile    
+    docker run -d --name gomob android-gomobile
+    docker exec -it gomob /bin/bash
+    
+    cd go/src/golang.org/x/mobile/example/basic/
+    gomobile build
