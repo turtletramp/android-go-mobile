@@ -1,7 +1,14 @@
 # Android section of this Dockerfile from https://medium.com/@elye.project/intro-to-docker-building-android-app-cb7fb1b97602
 
-FROM openjdk:8
+FROM ubuntu:16.04
 
+RUN apt-get update
+RUN apt-get -y install libegl1-mesa-dev libgles2-mesa-dev libx11-dev
+RUN apt-get -y install openjdk-8-jdk openjdk-8-jre
+RUN apt-get -y install software-properties-common python-dev && \
+    apt-get -y install python2.7-dev gdb build-essential libtool autotools-dev libcurl4-openssl-dev curl&& \
+    apt-get -y install git gcc g++ vim wget ethtool && \
+    apt-get -y install zlib1g zlib1g-dev devscripts unoconv
 
 ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" \
     ANDROID_HOME="/usr/local/android-sdk" \
@@ -90,3 +97,7 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" "$GOPATH/pkg" && chmod -R 777 "$GOPATH"
 # install gomobile
 RUN go get golang.org/x/mobile/cmd/gomobile
 RUN gomobile init -ndk $ANDROID_HOME/ndk-bundle/
+ADD vimrc /etc/vim/vimrc
+
+WORKDIR /workspace
+CMD /bin/bash -c "while true; do sleep 10;done"

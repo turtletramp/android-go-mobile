@@ -17,3 +17,15 @@ This image comes with gomobile checkedout and preinitialized (time and space con
         - cp -as /go /workspace/go
 
 `cp -as` recreates the directory structure from /go in /workspace/go but for each file, it just creates a symlink. This is the quickest and most efficent way to mirror the work supplied with the image into your workspace.
+
+# Re-arrange docker file
+
+- Change base image openjdk:8 to ubuntu:16.04
+- Install libgl & vim & curl & others
+- Build docker image & make .apk
+ docker build .  -t android-gomobile
+ docker run -d --name gomob android-gomobile
+ docker exec -it gomob /bin/bash
+
+ cd go/src/golang.org/x/mobile/example/basic/
+ gomobile build
