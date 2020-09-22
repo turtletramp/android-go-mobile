@@ -1,1 +1,2 @@
-docker build .  -t android-gomobile
+#/bin/bash
+docker build . -t android-gomobile

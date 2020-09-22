@@ -84,7 +84,9 @@ RUN set -eux; \
 	./make.bash; \
 	\
 	export PATH="/usr/local/go/bin:$PATH"; \
-	go version
+	go version; \
+	\
+	apt-get purge golang
 
 # persist new go in PATH
 ENV PATH /usr/local/go/bin:$PATH
