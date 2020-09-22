@@ -1,36 +1,38 @@
 # Android section of this Dockerfile from https://medium.com/@elye.project/intro-to-docker-building-android-app-cb7fb1b97602
 
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
-RUN apt-get update
-RUN apt-get -y install libegl1-mesa-dev libgles2-mesa-dev libx11-dev
-RUN apt-get -y install openjdk-8-jdk openjdk-8-jre
-RUN apt-get -y install software-properties-common python-dev && \
-    apt-get -y install python2.7-dev gdb build-essential libtool autotools-dev libcurl4-openssl-dev curl&& \
-    apt-get -y install git gcc g++ vim wget ethtool && \
-    apt-get -y install zlib1g zlib1g-dev devscripts unoconv
+RUN apt-get update -q && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -q -y --no-install-recommends libegl1-mesa-dev libgles2-mesa-dev libx11-dev \
+		software-properties-common python-dev \
+		openjdk-8-jdk openjdk-8-jre \
+    	python2.7-dev gdb build-essential libtool autotools-dev libcurl4-openssl-dev curl \
+    	git gcc g++ vim wget ethtool \
+    	zlib1g zlib1g-dev devscripts unoconv unzip && \
+	apt-get clean
 
-ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" \
+#ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" \
+ENV SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip" \
     ANDROID_HOME="/usr/local/android-sdk" \
     ANDROID_VERSION=28 \
-    ANDROID_BUILD_TOOLS_VERSION=28.0.1
+    ANDROID_BUILD_TOOLS_VERSION=30.0.2
 
 ## Download Android SDK
-RUN mkdir "$ANDROID_HOME" .android \
-    && cd "$ANDROID_HOME" \
+RUN mkdir "$ANDROID_HOME" .android "$ANDROID_HOME/cmdline-tools" \
+    && cd "$ANDROID_HOME/cmdline-tools" \
     && curl -o sdk.zip $SDK_URL \
     && unzip sdk.zip \
-    && rm sdk.zip \
-    && yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+    && rm sdk.zip
+RUN yes | $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --licenses
 
 ## Install Android Build Tool and Libraries
-RUN $ANDROID_HOME/tools/bin/sdkmanager --update
-RUN $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --update
+RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "platforms;android-${ANDROID_VERSION}" \
     "platform-tools"
 
 # Install NDK
-RUN $ANDROID_HOME/tools/bin/sdkmanager "ndk-bundle"
+RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "ndk-bundle"
 
 # Go section of this Dockerfile from Docker golang: https://github.com/docker-library/golang/blob/master/1.10/alpine3.8/Dockerfile
 # Adapted from alpine apk to debian apt
@@ -40,7 +42,8 @@ RUN $ANDROID_HOME/tools/bin/sdkmanager "ndk-bundle"
 ## - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
 RUN echo 'hosts: files dns' > /etc/nsswitch.conf
 
-ENV GOLANG_VERSION 1.10.3
+# NOTE: When changing this version take care to also change the chksum below (after wget)
+ENV GOLANG_VERSION 1.15.2
 
 RUN set -eux; \
 	apt-get update; \
@@ -51,6 +54,7 @@ RUN set -eux; \
 		libssl-dev \
 		golang \
 	; \
+	apt-get clean; \
 	rm -rf /var/lib/apt/lists/*; \
 	export \
 ## set GOROOT_BOOTSTRAP such that we can actually build Go
@@ -71,7 +75,7 @@ RUN set -eux; \
 	esac; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo '567b1cc66c9704d1c019c50bef946272e911ec6baf244310f87f4e678be155f2 *go.tgz' | sha256sum -c -; \
+	echo '28bf9d0bcde251011caae230a4a05d917b172ea203f2a62f2c2f9533589d4b4d *go.tgz' | sha256sum -c -; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
@@ -96,8 +100,7 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" "$GOPATH/pkg" && chmod -R 777 "$GOPATH"
 
 # install gomobile
 RUN go get golang.org/x/mobile/cmd/gomobile
-RUN gomobile init -ndk $ANDROID_HOME/ndk-bundle/
+RUN gomobile init
 ADD vimrc /etc/vim/vimrc
 
 WORKDIR /workspace
-CMD /bin/bash -c "while true; do sleep 10;done"

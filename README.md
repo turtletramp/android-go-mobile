@@ -1,11 +1,17 @@
+# License notes
+
+This image is forked from https://github.com/moohoorama/android-go-mobile which by itself was forked from https://github.com/OpenPriv/android-go-mobile.
+Thanks for your work  which helped a lot :)
+
 # Android, Go, and gomobile
 
-This image was built for use with Drone CI but can be used with any docker setup you want.
+This image was built for use with generic gombile builds for Android.
 
 This image includes:
 
+- based on Ubuntu 20.04
 - Android SDK, NDK, tools, and API version 28 at `/usr/local/android-sdk`
-- Go lang 1.10.3 at `/usr/local/go`
+- Go lang 1.15.2 at `/usr/local/go`
 - $GOPATH set to `/workspace/go`
 - A go directory with an initialized gomobile installed at `/go`
 
@@ -18,10 +24,8 @@ This image comes with gomobile checkedout and preinitialized (time and space con
 
 `cp -as` recreates the directory structure from /go in /workspace/go but for each file, it just creates a symlink. This is the quickest and most efficent way to mirror the work supplied with the image into your workspace.
 
-# Re-arrange docker file
+# usage (work in progress)
 
-- Change base image openjdk:8 to ubuntu:16.04
-- Install libgl & vim & curl & others
 - Build docker image & make .apk
 ```
     docker build .  -t android-gomobile    
