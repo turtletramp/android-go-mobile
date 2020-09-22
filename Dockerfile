@@ -29,7 +29,8 @@ RUN yes | $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --licenses
 RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --update
 RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "platforms;android-${ANDROID_VERSION}" \
-    "platform-tools"
+    "platform-tools" && \
+	$ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager --uninstall emulator
 
 # Install NDK
 RUN $ANDROID_HOME/cmdline-tools/tools/bin/sdkmanager "ndk-bundle"
